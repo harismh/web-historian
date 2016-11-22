@@ -10,7 +10,7 @@ var _ = require('underscore');
  */
 
 exports.paths = {
-  siteAssets: path.join(__dirname, '../web/public'),
+  siteAssets: path.join(__dirname, '../web/public'), // /web/public/
   archivedSites: path.join(__dirname, '../archives/sites'),
   list: path.join(__dirname, '../archives/sites.txt')
 };
@@ -25,17 +25,44 @@ exports.initialize = function(pathsObj) {
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-exports.readListOfUrls = function() {
+exports.readListOfUrls = function(callback) {
+  var list = [];
+  
+  fs.readFile(exports.paths.list, function(error, data) {
+    if (error) {
+      throw error;
+    } else {
+      list = data.toString().split('\n');
+      callback(list);
+    }
+  });
+
 };
 
-exports.isUrlInList = function() {
+exports.isUrlInList = function(url, callback) {
+  exports.readListOfUrls(function(list) {
+    var result = _.contains(list, url);
+    callback(result);
+  });
 };
 
-exports.addUrlToList = function() {
+exports.addUrlToList = function(url, callback) {
+  fs.appendFile(exports.paths.list, url + '\n', callback);
 };
 
-exports.isUrlArchived = function() {
+exports.isUrlArchived = function(url, callback) {
+  fs.readdir(exports.paths.archivedSites, function(error, files) {
+    if (error) {
+      throw error;
+    } else {
+      var result = _.contains(files, url);
+      callback(result);
+    }
+  });
 };
 
-exports.downloadUrls = function() {
+exports.downloadUrls = function(array) {
+  array.forEach(function(url) {
+    fs.createWriteStream(exports.paths.archivedSites + '/' + url);
+  });
 };
