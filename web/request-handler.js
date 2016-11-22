@@ -11,19 +11,20 @@ exports.handleRequest = function (req, res) {
     if (req.url === '/') {
       //console.log('url ', req.url);
       helper.serveAssets(res, req.url + 'index.html');
+    } else {
+      helper.serveAssets(res, req.url, function() {
+        archive.isUrlInList(req.url, function(result) {
+          if (result) {
+            res.writeHead(302, 'download page');
+            res.end();
+          } else {
+            res.writeHead(404, 'page not found');
+            res.end();
+          }
+        });
+      });
     }
     //console.log('url ', req.url);
-    helper.serveAssets(res, req.url, function() {
-      archive.isUrlInList(req.url, function(result) {
-        if (result) {
-          res.writeHead(302, 'download page');
-          res.end();
-        } else {
-          res.writeHead(404, 'page not found');
-          res.end();
-        }
-      });
-    });
   } else if (req.method === 'POST') {
     var string = '';
     req.on('data', function(chunk) {
@@ -32,14 +33,16 @@ exports.handleRequest = function (req, res) {
 
     req.on('end', function() {
       helper.serveAssets(res, string.slice(4), function() {
-        archive.isUrlInList(string.slice(4), function(result) {
-          if (!result) {
-            archive.addUrlToList(string.slice(4), function() {
-              res.writeHead(302, 'download page');
-              res.end();
-            });
+        archive.isUrlInList(string.slice(4), function(goal) {
+          if (goal) {
+            console.log('reached true');
+            console.log('../../archives/sites/' + string.slice(4));
+            res.writeHead(200, {Location: 'http://../../archives/sites/' + string.slice(4)});
+            res.end();
           } else {
-            res.writeHead(404, 'page not found');
+            console.log('reached false');
+            archive.addUrlToList(string.slice(4));
+            res.writeHead(302, {Location: './loading.html'});
             res.end();
           }
         });

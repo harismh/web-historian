@@ -32,13 +32,13 @@ exports.serveAssets = function(res, asset, callback) {
         } else {
           //found site in archives
           res.writeHead(200, 'success');
-          res.end(archiveData.toString());
+          res.end(archiveData);
         }
       });
     } else {
       //found site at siteAssets
       res.writeHead(200, 'success');
-      res.end(siteData.toString());
+      res.end(siteData);
     }
   });
 };
