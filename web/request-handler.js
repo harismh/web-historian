@@ -9,18 +9,9 @@ exports.handleRequest = function (req, res) {
   if (req.method === 'GET') {
     var parsed = url.parse(req.url);
     var path = parsed.pathname === '/' ? '/index.html' : parsed.pathname; 
-    
-    helper.serveAssets(res, path, function() {
-      archive.isUrlInList(path, function(result) {
-        if (result) {
-          res.writeHead(302, 'download page');
-          res.end();
-        } else {
-          res.writeHead(404, 'page not found');
-          res.end();
-        }
-      });
-    });
+  
+    helper.serveAssets(res, path);
+
   } else if (req.method === 'POST') {
     var string = '';
     req.on('data', function(chunk) {
@@ -28,14 +19,13 @@ exports.handleRequest = function (req, res) {
     });
 
     req.on('end', function() {
-      var url = string.slice(4);
+      var url = string.slice(4); 
 
       helper.serveAssets(res, url, function() {
         archive.isUrlInList(url, function(exists) {
           if (exists) {
             archive.isUrlArchived(url, function(found) {
               if (found) {
-                console.log('below redirect');
                 helper.serveRedirect(res, '/' + url, 200);
               }
             });
@@ -50,12 +40,3 @@ exports.handleRequest = function (req, res) {
     });
   }
 };
-
-// exports.handleRequest = function (req, res) {
-//   if (req.method === 'GET') {
-//     if (req.url === '/') {
-//       helper.serveAssets(res, req.url + 'index.html');
-//     }
-//     helper.serveAssets(res, req.url);
-//   }
-// };

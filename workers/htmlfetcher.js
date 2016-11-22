@@ -3,15 +3,6 @@
 var archive = require('../helpers/archive-helpers.js');
 var CronJob = require('cron').CronJob;
 
-new CronJob('* * * * *', function() {
-  console.log('You will see this message every second');
+new CronJob('* * * * * *', function() {
   archive.readListOfUrls(archive.downloadUrls);
 }, null, true);
-
-// exports.downloadWebsite = function() {
-//   setInterval(function() {
-//     archive.readListOfUrls(archive.downloadUrls);
-//   }, 5000);
-// };
-
-

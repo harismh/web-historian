@@ -63,22 +63,27 @@ exports.isUrlArchived = function(url, callback) {
       callback(result);
     }
   });
-  // var directory = path.join(exports.paths.archivedSites, url);
-  
-  // fs.exists(directory, function(error, success) {
-  //   if (success) {
-  //     callback (success);
-  //   }
-  // });
 };
 
 exports.downloadUrls = function(array) {
   array.forEach(function(url) {
     if (!!url) {
-      console.log('website requested');
-      request('http://' + url).pipe(fs.createWriteStream(exports.paths.archivedSites + '/' + url));
-    } else {
-      return;
+      exports.isUrlArchived(url, function(check) {
+        if (!check) {
+          console.log('fetching websites...');
+          request('http://' + url).pipe(fs.createWriteStream(exports.paths.archivedSites + '/' + url));
+        } else {
+          return;
+        }
+      });
     }
-  });
+  });    
+  // array.forEach(function(url) {
+  //   if (!!url) {
+  //     console.log('fetching websites...');
+  //     request('http://' + url).pipe(fs.createWriteStream(exports.paths.archivedSites + '/' + url));
+  //   } else {
+  //     return;
+  //   }
+  // });           
 };
