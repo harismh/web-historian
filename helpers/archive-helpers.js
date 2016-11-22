@@ -28,7 +28,6 @@ exports.initialize = function(pathsObj) {
 
 exports.readListOfUrls = function(callback) {
   var list = [];
-  
   fs.readFile(exports.paths.list, function(error, data) {
     if (error) {
       throw error;
@@ -48,7 +47,11 @@ exports.isUrlInList = function(url, callback) {
 };
 
 exports.addUrlToList = function(url, callback) {
-  fs.appendFile(exports.paths.list, url + '\n', callback);
+  fs.appendFile(exports.paths.list, url + '\n', function(error, data) {
+    if (!error) {
+      callback();
+    }
+  });
 };
 
 exports.isUrlArchived = function(url, callback) {
@@ -60,12 +63,19 @@ exports.isUrlArchived = function(url, callback) {
       callback(result);
     }
   });
+  // var directory = path.join(exports.paths.archivedSites, url);
+  
+  // fs.exists(directory, function(error, success) {
+  //   if (success) {
+  //     callback (success);
+  //   }
+  // });
 };
 
 exports.downloadUrls = function(array) {
   array.forEach(function(url) {
     if (!!url) {
-      fs.createWriteStream(exports.paths.archivedSites + '/' + url);
+      console.log('website requested');
       request('http://' + url).pipe(fs.createWriteStream(exports.paths.archivedSites + '/' + url));
     } else {
       return;

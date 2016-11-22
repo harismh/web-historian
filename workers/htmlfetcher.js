@@ -1,11 +1,17 @@
 // Use the code in `archive-helpers.js` to actually download the urls
 // that are waiting.
 var archive = require('../helpers/archive-helpers.js');
+var CronJob = require('cron').CronJob;
 
-var downloadArchive = function() {
-  archive.readListOfUrls(function(list) {
-    archive.downloadUrls(list);
-  });
-};
+new CronJob('* * * * *', function() {
+  console.log('You will see this message every second');
+  archive.readListOfUrls(archive.downloadUrls);
+}, null, true);
 
-setInterval(downloadArchive, 1000);
+// exports.downloadWebsite = function() {
+//   setInterval(function() {
+//     archive.readListOfUrls(archive.downloadUrls);
+//   }, 5000);
+// };
+
+

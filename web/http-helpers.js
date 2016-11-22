@@ -26,19 +26,30 @@ exports.serveAssets = function(res, asset, callback) {
           if (callback) {
             callback(archiveData); // to create website
           } else {
-            res.writeHead(404, 'error');
+            res.writeHead(404, exports.headers);
             res.end();
           }
         } else {
           //found site in archives
-          res.writeHead(200, 'success');
-          res.end(archiveData);
+          res.writeHead(200, exports.headers);
+          res.end(archiveData.toString());
         }
       });
     } else {
       //found site at siteAssets
-      res.writeHead(200, 'success');
-      res.end(siteData);
+      res.writeHead(200, exports.headers);
+      res.end(siteData.toString());
+    }
+  });
+};
+
+exports.serveRedirect = function(res, url, code) {
+  fs.readFile(archive.paths.archivedSites + url, function(error, data) {
+    if (error) {
+      throw error;
+    } else {
+      res.writeHead(code, {Location: archive.paths.archivedSites + url + '.html'});
+      res.end(data.toString());
     }
   });
 };
